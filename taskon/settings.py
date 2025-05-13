@@ -196,6 +196,11 @@ SIMPLE_JWT = {
 #     "http://127.0.0.1:3000",
 #     "taskon-bg0x.onrender.com",
 # ]
+ALLOWED_HOSTS = ['taskon-bg0x.onrender.com',
+                 'localhost',
+                 '127.0.0.1'
+                 ]
+
 
 CORS_ALLOW_METHODS = [
     'DELETE',
