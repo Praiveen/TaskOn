@@ -3,7 +3,7 @@ class EmployeeManager {
         this.currentDepartmentId = null;
         this.currentSubdepartmentId = null;
         
-        // Получение CSRF-токена из cookie для Django
+        
         this.csrfToken = this.getCookie('csrftoken');
         if (!this.csrfToken) {
             const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -368,7 +368,7 @@ class EmployeeManager {
         }
     }
 
-    // Метод для получения CSRF-токена из cookie для Django
+    
     getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {

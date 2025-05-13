@@ -1,6 +1,6 @@
 class CurrentUserEvents {
     constructor() {
-        // Получение CSRF-токена из cookie
+
         this.csrfToken = this.getCookie('csrftoken');
         if (!this.csrfToken) {
             const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -8,7 +8,7 @@ class CurrentUserEvents {
                 this.csrfToken = csrfElement.value;
             }
         }
-        
+
         this.loadUserEvents();
         this.initializeEventListeners();
     }
@@ -55,12 +55,12 @@ class CurrentUserEvents {
                 },
                 credentials: 'same-origin'
             });
-            
+
             if (!response.ok) throw new Error('Ошибка загрузки событий');
-            
+
             const events = await response.json();
             this.renderEvents(events);
-            
+
             this.updateCalendarEvents(events);
         } catch (error) {
             console.error('Error loading events:', error);
@@ -70,26 +70,26 @@ class CurrentUserEvents {
     updateCalendarEvents(events) {
         window.calendarTasks = window.calendarTasks || {};
         const calendarTasks = window.calendarTasks;
-        
-        // Добавляем текущие события в календарь
+
+
         if (events.currentEvents && events.currentEvents.length > 0) {
             events.currentEvents.forEach(event => {
                 if (!event.startTime) return;
-                
+
                 const date = new Date(event.startTime);
                 const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-                
+
                 if (!calendarTasks[dateKey]) {
                     calendarTasks[dateKey] = [];
                 }
-                
+
                 calendarTasks[dateKey].push({
                     title: event.title,
                     type: 'event'
                 });
             });
         }
-        
+
         if (window.refreshCalendar) {
             window.refreshCalendar();
         }
@@ -98,7 +98,7 @@ class CurrentUserEvents {
     renderEvents(events) {
         const currentEventsContainer = document.querySelector('.current-events');
         const pastEventsContainer = document.querySelector('.past-events');
-        
+
         if (currentEventsContainer) {
             if (!events.currentEvents || events.currentEvents.length === 0) {
                 currentEventsContainer.innerHTML = '<p>Нет активных событий</p>';
@@ -137,7 +137,7 @@ class CurrentUserEvents {
                 `).join('');
             }
         }
-        
+
         if (pastEventsContainer) {
             if (!events.pastEvents || events.pastEvents.length === 0) {
                 pastEventsContainer.innerHTML = '<p>Нет прошедших событий</p>';
@@ -169,7 +169,7 @@ class CurrentUserEvents {
 
     getStatusClass(status) {
         if (!status) return '';
-        
+
         const statusMap = {
             'PLANNED': 'planned',
             'COMPLETED': 'completed',
@@ -178,13 +178,13 @@ class CurrentUserEvents {
             'completed': 'completed',
             'cancelled': 'cancelled'
         };
-        
+
         return statusMap[status] || status.toLowerCase();
     }
-    
+
     getStatusText(status) {
         if (!status) return 'Неизвестно';
-        
+
         const statusMap = {
             'PLANNED': 'Запланировано',
             'COMPLETED': 'Завершено',
@@ -193,25 +193,25 @@ class CurrentUserEvents {
             'completed': 'Завершено',
             'cancelled': 'Отменено'
         };
-        
+
         return statusMap[status] || status;
     }
 
     formatDate(dateString) {
         if (!dateString) return 'Не указано';
-        
+
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return 'Некорректная дата';
-        
+
         return date.toLocaleDateString('ru-RU');
     }
 
     formatTime(dateString) {
         if (!dateString) return 'Не указано';
-        
+
         const date = new Date(dateString);
         if (isNaN(date.getTime())) return 'Некорректное время';
-        
+
         return date.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
     }
 

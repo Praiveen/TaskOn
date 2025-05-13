@@ -1,9 +1,9 @@
-// import { createSearchableSelect } from './searchInSelection.js';
+
 import { SubDepartmentManager } from './subDepartmentManager.js';
 
 class DepartmentManager {
     constructor() {
-        // Получение CSRF-токена из cookie
+
         this.csrfToken = this.getCookie('csrftoken');
         if (!this.csrfToken) {
             const csrfElement = document.querySelector('[name=csrfmiddlewaretoken]');
@@ -11,7 +11,7 @@ class DepartmentManager {
                 this.csrfToken = csrfElement.value;
             }
         }
-        
+
         this.form = document.getElementById('createDepartmentForm');
         this.departmentHeadSelect = document.getElementById('departmentHead');
         this.departmentsContainer = document.querySelector('.departments-container');
@@ -21,10 +21,10 @@ class DepartmentManager {
         this.modalTitle = this.modal.querySelector('.modal-title');
         this.modalBody = this.modal.querySelector('.modal-body');
         this.closeModalBtn = this.modal.querySelector('.close-modal');
-        
+
         this.searchableSelect = null;
         this.subDepartmentManager = null;
-        
+
         this.initialize();
         this.setupModalEvents();
     }
@@ -43,13 +43,13 @@ class DepartmentManager {
         }
         return cookieValue;
     }
-    
+
     async initialize() {
         await this.loadUsers();
         await this.loadDepartments();
         this.setupEventListeners();
     }
-    
+
     async loadUsers() {
         try {
             const response = await fetch('/department/users/', {
@@ -58,16 +58,16 @@ class DepartmentManager {
                     'X-CSRFToken': this.csrfToken
                 }
             });
-            
+
             if (!response.ok) throw new Error('Ошибка загрузки пользователей');
-            
+
             this.users = await response.json();
             this.updateUsersList(this.users);
         } catch (error) {
             console.error('Error loading users:', error);
         }
     }
-    
+
     updateUsersList(users) {
         this.departmentHeadSelect.innerHTML = '<option value="">Выберите руководителя</option>';
         users.forEach(user => {
@@ -77,7 +77,7 @@ class DepartmentManager {
             this.departmentHeadSelect.appendChild(option);
         });
     }
-    
+
     async loadDepartments() {
         try {
             const response = await fetch('/department/list/', {
@@ -86,9 +86,9 @@ class DepartmentManager {
                     'X-CSRFToken': this.csrfToken
                 }
             });
-            
+
             if (!response.ok) throw new Error('Ошибка загрузки отделов');
-            
+
             const departments = await response.json();
             this.renderDepartments(departments);
         } catch (error) {
@@ -96,9 +96,9 @@ class DepartmentManager {
             this.departmentsContainer.innerHTML = '<p class="error">Ошибка загрузки отделов</p>';
         }
     }
-    
+
     renderDepartments(departments) {
-        this.departmentsContainer.innerHTML = departments.length ? '' : 
+        this.departmentsContainer.innerHTML = departments.length ? '' :
             '<div class="no-departments">Отделы пока не созданы</div>';
 
         departments.forEach(department => {
@@ -157,16 +157,16 @@ class DepartmentManager {
             this.departmentsContainer.appendChild(departmentElement);
         });
     }
-    
+
     setupEventListeners() {
         this.form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const formData = {
                 departmentName: this.form.querySelector('#departmentName').value,
                 headId: parseInt(this.departmentHeadSelect.value)
             };
-    
+
             try {
                 const response = await fetch('/department/create/', {
                     method: 'POST',
@@ -177,7 +177,7 @@ class DepartmentManager {
                     },
                     body: JSON.stringify(formData)
                 });
-    
+
                 if (response.ok) {
                     this.form.reset();
                     await this.loadDepartments();
@@ -192,11 +192,11 @@ class DepartmentManager {
             }
         });
     }
-    
+
     showSubDepartments(departmentId) {
         const createSubdepartmentBlock = document.querySelector('.create-subdepartment-block');
         const subdepartmentsListBlock = document.querySelector('.subdepartments-list-block');
-        
+
         if (this.subDepartmentManager && this.subDepartmentManager.parentDepartmentId === departmentId) {
             createSubdepartmentBlock.style.display = 'none';
             subdepartmentsListBlock.style.display = 'none';
@@ -204,17 +204,17 @@ class DepartmentManager {
             this.subDepartmentManager = null;
             return;
         }
-        
+
         createSubdepartmentBlock.style.display = 'block';
         subdepartmentsListBlock.style.display = 'block';
-        
+
         if (this.subDepartmentManager) {
             this.subDepartmentManager.destroy();
         }
-        
+
         this.subDepartmentManager = new SubDepartmentManager(departmentId);
     }
-    
+
     async editDepartment(departmentId) {
         try {
             const response = await fetch(`/department/${departmentId}/`, {
@@ -223,16 +223,16 @@ class DepartmentManager {
                     'X-CSRFToken': this.csrfToken
                 }
             });
-            
+
             if (!response.ok) throw new Error('Ошибка загрузки данных отдела');
-            
+
             const department = await response.json();
-            
-            // Загрузка пользователей, если еще не загружены
+
+
             if (!this.users.length) {
                 await this.loadUsers();
             }
-            
+
             const formHtml = `
                 <form id="editDepartmentForm" class="department-form">
                     <input type="hidden" id="editDepartmentId" value="${department.id}">
@@ -267,11 +267,11 @@ class DepartmentManager {
                 </form>
             `;
 
-            // Настраиваем модальное окно
+
             this.modalTitle.textContent = 'Редактирование отдела';
             this.modalBody.innerHTML = formHtml;
 
-            // Добавляем обработчик отправки формы
+
             const form = this.modalBody.querySelector('#editDepartmentForm');
             form.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -284,7 +284,7 @@ class DepartmentManager {
             alert('Не удалось загрузить данные отдела');
         }
     }
-    
+
     generateUserOptions(users, selectedUserId) {
         return users.map(user => `
             <option 
@@ -295,7 +295,7 @@ class DepartmentManager {
             </option>
         `).join('');
     }
-    
+
     async updateDepartment() {
         const departmentId = document.getElementById('editDepartmentId').value;
         const departmentData = {
@@ -326,24 +326,24 @@ class DepartmentManager {
             alert('Произошла ошибка при обновлении отдела');
         }
     }
-    
+
     openModal() {
         this.modal.classList.add('show');
     }
-    
+
     closeModal() {
         this.modal.classList.remove('show');
         this.modalBody.innerHTML = '';
         this.modalTitle.textContent = '';
     }
-    
+
     setupModalEvents() {
         this.closeModalBtn.addEventListener('click', () => this.closeModal());
         this.modal.addEventListener('click', (e) => {
             if (e.target === this.modal) this.closeModal();
         });
     }
-    
+
     async deleteDepartment(departmentId) {
         if (confirm('Вы уверены, что хотите удалить этот отдел?')) {
             try {
@@ -370,5 +370,5 @@ class DepartmentManager {
     }
 }
 
-// Удаляем автоматическую инициализацию, так как она обрабатывается в dashboard.html
+
 export default DepartmentManager;

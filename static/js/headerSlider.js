@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // Закрываем меню при клике вне его
+    
     document.addEventListener('click', function(e) {
         if (!dropBtn.contains(e.target) && !dropdownContent.contains(e.target)) {
             dropdownContent.classList.remove('show');

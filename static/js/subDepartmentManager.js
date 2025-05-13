@@ -4,18 +4,18 @@ export class SubDepartmentManager {
     constructor(parentDepartmentId = null) {
         console.log('SubDepartmentManager constructor called');
         
-        // Получение CSRF-токена
+        
         const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]');
         if (csrftoken) {
             this.csrfToken = csrftoken.value;
             console.log('CSRF token found in input element:', this.csrfToken.substring(0, 5) + '...');
         } else {
-            // Получение из cookie
+            
         this.csrfToken = this.getCookie('csrftoken');
             if (this.csrfToken) {
                 console.log('CSRF token found in cookie:', this.csrfToken.substring(0, 5) + '...');
             } else {
-                // Поиск в форме csrf-form
+                
                 const csrfForm = document.getElementById('csrf-form');
                 if (csrfForm) {
                     const csrfElement = csrfForm.querySelector('[name=csrfmiddlewaretoken]');
@@ -47,11 +47,11 @@ export class SubDepartmentManager {
         }
     }
     
-    // Метод для получения CSRF-токена из cookie для Django
+    
     getCookie(name) {
         console.log('Getting CSRF token...');
         
-        // Сначала пытаемся получить токен из cookies
+        
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {
             const cookies = document.cookie.split(';');
@@ -65,7 +65,7 @@ export class SubDepartmentManager {
             }
         }
         
-        // Если не нашли в cookies, ищем в meta-теге
+        
         if (!cookieValue) {
             const csrfMeta = document.querySelector('meta[name="csrf-token"]');
             if (csrfMeta) {
@@ -74,7 +74,7 @@ export class SubDepartmentManager {
             }
         }
         
-        // Если и там нет, ищем в форме
+        
         if (!cookieValue) {
             const csrfElement = document.querySelector('input[name="csrfmiddlewaretoken"]');
             if (csrfElement) {
@@ -83,7 +83,7 @@ export class SubDepartmentManager {
             }
         }
         
-        // Финальная проверка
+        
         if (!cookieValue) {
             console.error('CSRF token not found!');
         }
@@ -143,7 +143,7 @@ export class SubDepartmentManager {
         await this.loadUsers();
         await this.loadSubDepartments();
         
-        // Добавляем скрытое поле для CSRF токена в форму, если его нет
+        
         const csrfInputInForm = this.form.querySelector('[name="csrfmiddlewaretoken"]');
         if (!csrfInputInForm && this.csrfToken) {
             const csrfInput = document.createElement('input');
@@ -262,10 +262,10 @@ export class SubDepartmentManager {
         
             console.log('Submitting form directly');
             
-            // Прямая отправка формы вместо AJAX
+            
             const form = document.getElementById('createSubDepartmentForm');
             
-            // Создаем скрытые поля для данных
+            
             let subdeptNameInput = form.querySelector('input[name="subdepartmentName"]');
             if (!subdeptNameInput) {
                 subdeptNameInput = document.getElementById('subdepartmentName');
@@ -289,7 +289,7 @@ export class SubDepartmentManager {
             }
             deptIdInput.value = this.parentDepartmentId;
             
-            // Убедимся, что есть CSRF токен
+            
             let csrfInput = form.querySelector('input[name="csrfmiddlewaretoken"]');
             if (!csrfInput) {
                 csrfInput = document.createElement('input');
@@ -305,25 +305,25 @@ export class SubDepartmentManager {
             console.log('Form method:', form.method);
             console.log('CSRF token in form:', csrfInput.value.substring(0, 5) + '...');
             
-            // Устанавливаем атрибуты формы
+            
             form.action = '/dashboard/departments/subdepartments/create/';
             form.method = 'POST';
             
-            // Устанавливаем обработчик для формы
+            
             const originalAction = form.action;
             const originalMethod = form.method;
             
             try {
-                // Используем XMLHttpRequest для отправки формы
+                
                 const xhr = new XMLHttpRequest();
                 xhr.open('POST', '/dashboard/departments/subdepartments/create/');
                 xhr.setRequestHeader('X-CSRFToken', this.csrfToken);
                 xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
                 
-                // Собираем данные формы
+                
                 const formData = new FormData(form);
                 
-                // Устанавливаем обработчик
+                
                 xhr.onload = async () => {
                     console.log('XHR status:', xhr.status);
                     
@@ -357,13 +357,13 @@ export class SubDepartmentManager {
                     alert('Произошла ошибка при отправке запроса');
                 };
                 
-                // Отправляем запрос
+                
                 xhr.send(formData);
             } catch (error) {
                 console.error('Error submitting form:', error);
                 alert('Произошла ошибка при создании подотдела');
                 
-                // Восстанавливаем оригинальные значения
+                
                 form.action = originalAction;
                 form.method = originalMethod;
             }
@@ -430,7 +430,7 @@ export class SubDepartmentManager {
 
     async editSubDepartment(subdepartmentId) {
         try {
-            // Проверяем наличие CSRF-токена перед отправкой запроса
+            
             if (!this.csrfToken) {
                 console.error('CSRF token is missing! Attempting to get a new token...');
                 this.csrfToken = this.getCookie('csrftoken');
@@ -550,7 +550,7 @@ export class SubDepartmentManager {
                         const responseText = await response.text();
                         console.error('Server error:', responseText);
                         
-                        // Проверяем, связана ли ошибка с CSRF
+                        
                         if (response.status === 403 && responseText.includes('CSRF')) {
                             alert('Ошибка CSRF-защиты. Пожалуйста, обновите страницу и попробуйте снова.');
                 } else {
@@ -573,7 +573,7 @@ export class SubDepartmentManager {
     async deleteSubDepartment(subdepartmentId) {
         if (confirm('Вы уверены, что хотите удалить этот подотдел?')) {
             try {
-                // Проверяем наличие CSRF-токена перед отправкой запроса
+                
                 if (!this.csrfToken) {
                     console.error('CSRF token is missing! Attempting to get a new token...');
                     this.csrfToken = this.getCookie('csrftoken');
@@ -614,7 +614,7 @@ export class SubDepartmentManager {
                     const responseText = await response.text();
                     console.error('Server error:', responseText);
                     
-                    // Проверяем, связана ли ошибка с CSRF
+                    
                     if (response.status === 403 && responseText.includes('CSRF')) {
                         alert('Ошибка CSRF-защиты. Пожалуйста, обновите страницу и попробуйте снова.');
                     } else {
@@ -660,5 +660,4 @@ export class SubDepartmentManager {
 
 export default SubDepartmentManager;
 
-// В конце файла не добавляем автоматическую инициализацию, она происходит через import в dashboard.html
-// и в DepartmentManager.js
+

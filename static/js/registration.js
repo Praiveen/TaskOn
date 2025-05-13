@@ -1,14 +1,14 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.querySelector('#registerForm');
-    if (!form) return; // Проверка наличия формы на странице
+    if (!form) return; 
 
-    // Обработка автоматического заполнения fullName
+    
     const firstNameInput = document.querySelector('#firstName');
     const lastNameInput = document.querySelector('#lastName');
     const fullNameInput = document.querySelector('#fullName');
 
     if (firstNameInput && lastNameInput && fullNameInput) {
-        // Автозаполнение fullName при изменении firstName или lastName
+        
         function updateFullName() {
             if (!fullNameInput.value.trim()) {
                 const firstName = firstNameInput.value.trim();
@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', async (event) => {
         event.preventDefault();
 
-        // Очищаем сообщения перед отправкой
+        
         if (errorAlert) {
             errorAlert.style.display = 'none';
             errorAlert.innerHTML = "";
@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
             successAlert.innerHTML = "";
         }
 
-        // Проверка пароля
+        
         const password = document.querySelector('#password').value;
         const passwordConfirm = document.querySelector('#passwordConfirm').value;
 
@@ -70,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Проверка наличия fullName
+        
         if (!data.fullName && data.firstName && data.lastName) {
             data.fullName = `${data.firstName} ${data.lastName}`;
         }
@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 let errorMsg = responseData.message || 'Произошла ошибка при регистрации';
                 
-                // Обработка детализированных ошибок
+                
                 if (responseData.errors) {
                     const errorMessages = [];
                     for (const field in responseData.errors) {
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     successAlert.innerHTML = '<p>' + responseData.message + '</p>';
                     successAlert.style.display = 'block';
                     
-                    // Перенаправление на страницу входа после успешной регистрации
+                    
                     setTimeout(() => {
                         window.location.href = '/login/';
                     }, 2000);

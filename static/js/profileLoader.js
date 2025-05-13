@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // Получаем CSRF-токен для запросов
+    
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
     
     try {
@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('department').value = userData.department ? userData.department.name : 'Не указано';
         document.getElementById('subDepartment').value = userData.subDepartment ? userData.subDepartment.name : 'Не указано';
 
-        // Обработка ролей
+        
         if (userData.roles && userData.roles.length > 0) {
             const roleNames = userData.roles.map(role => role.name).join(', ');
             document.getElementById('role').value = roleNames;
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 if (response.ok) {
                     showMessage('Данные успешно обновлены', true);
                     
-                    // Обновляем данные на странице
+                    
                     const updatedResponse = await fetch('/users/userData/', {
                         headers: {
                             'X-Requested-With': 'XMLHttpRequest'
@@ -96,7 +96,7 @@ function showMessage(message, isSuccess) {
             statusElement.style.display = 'none';
         }, 3000);
     } else {
-        // Fallback if status element is not found
+        
         alert(message);
     }
 }

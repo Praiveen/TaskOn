@@ -1,10 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Инициализация обработчиков для уведомлений');
     
-    // Инициализация обработчиков для уведомлений
+    
     initNotifications();
     
-    // Функция для загрузки уведомлений с сервера
+    
     loadNotifications();
 });
 
@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function initNotifications() {
     console.log('Инициализируем обработчики для кнопок в уведомлениях');
     
-    // Обработчики для кнопок "Прочитано"
+    
     document.querySelectorAll('.readNotification').forEach(button => {
         button.addEventListener('click', function() {
             const notificationId = this.dataset.notificationId;
@@ -22,7 +22,7 @@ function initNotifications() {
         });
     });
     
-    // Обработчики для кнопок "Принять"
+    
     document.querySelectorAll('.accept-button').forEach(button => {
         button.addEventListener('click', function() {
             const notificationId = this.dataset.notificationId;
@@ -30,7 +30,7 @@ function initNotifications() {
         });
     });
     
-    // Обработчики для кнопок "Отклонить"
+    
     document.querySelectorAll('.reject-button').forEach(button => {
         button.addEventListener('click', function() {
             const notificationId = this.dataset.notificationId;
@@ -104,13 +104,13 @@ function displayNotifications(notifications) {
     
     container.innerHTML = '';
     
-    // Сортируем уведомления по дате (новые первыми)
+    
     notifications.sort((a, b) => new Date(b.sendDate) - new Date(a.sendDate));
     
     notifications.forEach(notification => {
         const notificationItem = document.createElement('div');
         notificationItem.className = 'notification-item';
-        // Используем id вместо notificationId для соответствия бэкенду
+        
         const notificationId = notification.id || notification.notificationId;
         notificationItem.dataset.notificationId = notificationId;
         
@@ -123,7 +123,7 @@ function displayNotifications(notifications) {
             minute: '2-digit'
         }).replace(',', '');
         
-        // Проверяем тип уведомления
+        
         if (notification.type === 'actionMessage') {
             console.log('Уведомление типа actionMessage');
             notificationItem.innerHTML = `
@@ -147,7 +147,7 @@ function displayNotifications(notifications) {
         container.appendChild(notificationItem);
     });
     
-    // Инициализируем обработчики для новых кнопок
+    
     initNotifications();
 }
 
@@ -172,7 +172,7 @@ function markNotificationAsRead(notificationId) {
                 throw new Error('Уведомление не найдено');
             }
             
-            // Пробуем распарсить JSON, но если не получится, вернем общую ошибку
+            
             return response.text().then(text => {
                 try {
                     const data = JSON.parse(text);
@@ -186,7 +186,7 @@ function markNotificationAsRead(notificationId) {
             try {
                 return JSON.parse(text);
             } catch (e) {
-                // Если ответ не JSON, создаем простой объект
+                
                 return { success: true, message: 'Уведомление отмечено как прочитанное' };
             }
         });
@@ -312,7 +312,7 @@ function removeNotificationFromDOM(notificationId) {
         setTimeout(() => {
             notification.remove();
             
-            // Проверяем, остались ли еще уведомления
+            
             const container = document.getElementById('notifications-container');
             if (container && container.querySelectorAll('.notification-item').length === 0) {
                 container.innerHTML = '<p class="notification-not-message">Нет новых уведомлений</p>';

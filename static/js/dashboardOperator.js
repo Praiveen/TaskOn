@@ -1,4 +1,4 @@
-// Получение CSRF-токена из cookie
+
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -14,7 +14,7 @@ function getCookie(name) {
     return cookieValue;
 }
 
-// Глобальный CSRF-токен для использования в запросах
+
 const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -73,8 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Загрузка и обработка уведомлений
-document.addEventListener('DOMContentLoaded', function() {
+
+document.addEventListener('DOMContentLoaded', function () {
     loadNotifications();
 });
 
@@ -84,37 +84,37 @@ function loadNotifications() {
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Ошибка при загрузке уведомлений');
-        }
-        return response.json();
-    })
-    .then(notifications => {
-        const container = document.getElementById('notifications-container');
-        if (!container) return;
-        
-        container.innerHTML = '';
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Ошибка при загрузке уведомлений');
+            }
+            return response.json();
+        })
+        .then(notifications => {
+            const container = document.getElementById('notifications-container');
+            if (!container) return;
 
-        if (!notifications || notifications.length === 0) {
-            container.innerHTML = '<p class="notification-not-message">Нет новых уведомлений</p>';
-            return;
-        }
+            container.innerHTML = '';
 
-        notifications.forEach(notification => {
-            const notificationElement = createNotificationElement(notification);
-            container.appendChild(notificationElement);
+            if (!notifications || notifications.length === 0) {
+                container.innerHTML = '<p class="notification-not-message">Нет новых уведомлений</p>';
+                return;
+            }
+
+            notifications.forEach(notification => {
+                const notificationElement = createNotificationElement(notification);
+                container.appendChild(notificationElement);
+            });
+        })
+        .catch(error => {
+            console.error('Ошибка при загрузке уведомлений:', error);
         });
-    })
-    .catch(error => {
-        console.error('Ошибка при загрузке уведомлений:', error);
-    });
 }
 
 function createNotificationElement(notification) {
     const div = document.createElement('div');
     div.className = 'notification-item';
-    
+
     if (!notification || !notification.type) {
         div.innerHTML = `
         <div class="notification-content">
@@ -122,8 +122,8 @@ function createNotificationElement(notification) {
         </div>`;
         return div;
     }
-    
-    if (notification.type == "simpleMessage"){
+
+    if (notification.type == "simpleMessage") {
         div.innerHTML = `
         <div class="notification-content">
             <p class="notification-message">${notification.message || 'Нет сообщения'}</p>
@@ -138,7 +138,7 @@ function createNotificationElement(notification) {
         </div>
         `;
     }
-    else if (notification.type == "actionMessage"){
+    else if (notification.type == "actionMessage") {
         div.innerHTML = `
         <div class="notification-content">
             <p class="notification-message">${notification.message || 'Нет сообщения'}</p>
@@ -154,21 +154,21 @@ function createNotificationElement(notification) {
         </div>
         `;
     }
-    
+
     return div;
 }
 
 function formatDate(dateString) {
     if (!dateString) return 'Неизвестно';
-    
+
     const date = new Date(dateString);
     if (isNaN(date.getTime())) return 'Некорректная дата';
-    
+
     return date.toLocaleString('ru-RU');
 }
 
-// Определяем глобальные функции для работы с уведомлениями
-window.acceptRequest = function(notificationId) {
+
+window.acceptRequest = function (notificationId) {
     fetch(`/dashboard/notifications/accept/${notificationId}/`, {
         method: 'POST',
         headers: {
@@ -176,23 +176,23 @@ window.acceptRequest = function(notificationId) {
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message || 'Ошибка при принятии заявки'); });
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message || 'Заявка принята');
-        loadNotifications();
-    })
-    .catch(error => {
-        console.error('Ошибка при принятии заявки:', error);
-        alert('Ошибка при принятии заявки: ' + error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Ошибка при принятии заявки'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message || 'Заявка принята');
+            loadNotifications();
+        })
+        .catch(error => {
+            console.error('Ошибка при принятии заявки:', error);
+            alert('Ошибка при принятии заявки: ' + error.message);
+        });
 }
 
-window.rejectRequest = function(notificationId) {
+window.rejectRequest = function (notificationId) {
     fetch(`/dashboard/notifications/reject/${notificationId}/`, {
         method: 'POST',
         headers: {
@@ -200,23 +200,23 @@ window.rejectRequest = function(notificationId) {
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message || 'Ошибка при отклонении заявки'); });
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message || 'Заявка отклонена');
-        loadNotifications();
-    })
-    .catch(error => {
-        console.error('Ошибка при отклонении заявки:', error);
-        alert('Ошибка при отклонении заявки: ' + error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Ошибка при отклонении заявки'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message || 'Заявка отклонена');
+            loadNotifications();
+        })
+        .catch(error => {
+            console.error('Ошибка при отклонении заявки:', error);
+            alert('Ошибка при отклонении заявки: ' + error.message);
+        });
 }
 
-window.readNotification = function(notificationId) {
+window.readNotification = function (notificationId) {
     fetch(`/dashboard/notifications/read/${notificationId}/`, {
         method: 'POST',
         headers: {
@@ -224,18 +224,18 @@ window.readNotification = function(notificationId) {
             'X-Requested-With': 'XMLHttpRequest'
         }
     })
-    .then(response => {
-        if (!response.ok) {
-            return response.json().then(err => { throw new Error(err.message || 'Ошибка при обработке уведомления'); });
-        }
-        return response.json();
-    })
-    .then(data => {
-        alert(data.message || 'Уведомление отмечено как прочитанное');
-        loadNotifications();
-    })
-    .catch(error => {
-        console.error('Ошибка при обработке уведомления:', error);
-        alert('Ошибка: ' + error.message);
-    });
+        .then(response => {
+            if (!response.ok) {
+                return response.json().then(err => { throw new Error(err.message || 'Ошибка при обработке уведомления'); });
+            }
+            return response.json();
+        })
+        .then(data => {
+            alert(data.message || 'Уведомление отмечено как прочитанное');
+            loadNotifications();
+        })
+        .catch(error => {
+            console.error('Ошибка при обработке уведомления:', error);
+            alert('Ошибка: ' + error.message);
+        });
 }

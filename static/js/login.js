@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const errorAlert = document.querySelector('#errorAlert');
         const successAlert = document.querySelector('#successAlert');
         
-        // Сбрасываем состояние уведомлений
+        
         if (errorAlert) {
             errorAlert.style.display = 'none';
             errorAlert.innerHTML = '';
@@ -45,18 +45,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const data = await response.json();
             
             if (response.ok) {
-                // При успешной авторизации
+                
                 if (successAlert) {
                     successAlert.innerHTML = '<p>Вход выполнен успешно. Перенаправление...</p>';
                     successAlert.style.display = 'block';
                 }
                 
-                // Перенаправление на соответствующую страницу
+                
                 setTimeout(() => {
                     window.location.href = data.redirect || '/dashboard/';
                 }, 1000);
             } else {
-                // При ошибке
+                
                 if (errorAlert) {
                     errorAlert.innerHTML = '<p>' + (data.message || 'Ошибка авторизации') + '</p>';
                     errorAlert.style.display = 'block';
