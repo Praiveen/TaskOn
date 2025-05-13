@@ -1,6 +1,5 @@
 @startuml
-' Вертикальная ориентация (по умолчанию top to bottom)
-' Можно явно указать:
+
 left to right direction
 skinparam linetype ortho
 
