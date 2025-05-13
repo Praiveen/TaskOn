@@ -27,10 +27,13 @@ SECRET_KEY = 'django-insecure-m$u3s*^oxuetr1g4a-8_oz1n#3zo_s2*c7h88ol(6byylt-ovv
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['taskon-bg0x.onrender.com', 'localhost', '127.0.0.1']
+if DEBUG:
+    ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+else:
+    site_url = os.environ.get('SITE_URL')
+    ALLOWED_HOSTS = [site_url, 'localhost', '127.0.0.1']
+    
 
-
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -48,7 +51,6 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -57,6 +59,9 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+if not DEBUG:
+    MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 ROOT_URLCONF = 'taskon.urls'
 
@@ -81,23 +86,34 @@ WSGI_APPLICATION = 'taskon.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-database_name = os.environ.get('DATABASE_NAME')
-database_user = os.environ.get('DATABASE_USER')
-database_password = os.environ.get('DATABASE_PASSWORD')
-database_host = os.environ.get('DATABASE_HOST')
-database_port = os.environ.get('DATABASE_PORT')
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': database_name,
-        'USER': database_user,
-        'PASSWORD': database_password,
-        'HOST': database_host,
-        'PORT': database_port,
+if DEBUG:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': "taskon",
+            'USER': "postgres",
+            'PASSWORD': "12345",
+            'HOST': "localhost",
+            'PORT': "5432",
+        }
     }
-}
+else:
+    database_name = os.environ.get('DATABASE_NAME')
+    database_user = os.environ.get('DATABASE_USER')
+    database_password = os.environ.get('DATABASE_PASSWORD')
+    database_host = os.environ.get('DATABASE_HOST')
+    database_port = os.environ.get('DATABASE_PORT')
+    
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': database_name,
+            'USER': database_user,
+            'PASSWORD': database_password,
+            'HOST': database_host,
+            'PORT': database_port,
+        }
+    }
 
 
 # Password validation
@@ -140,13 +156,11 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# WhiteNoise для раздачи статических файлов
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# Whitenoise настройки для WSGI
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_MANIFEST_STRICT = False
-WHITENOISE_ALLOW_ALL_ORIGINS = True
+if not DEBUG:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    WHITENOISE_USE_FINDERS = True
+    WHITENOISE_MANIFEST_STRICT = False
+    WHITENOISE_ALLOW_ALL_ORIGINS = True
 
 
 # Default primary key field type
