@@ -220,7 +220,6 @@ CORS_ALLOWED_ORIGINS = [
     "https://taskon-bg0x.onrender.com",
 ]
 
-# Разрешаем любые cross-origin запросы с указанных доменов
 CORS_ALLOW_CREDENTIALS = True
 
 CORS_ALLOW_METHODS = [
