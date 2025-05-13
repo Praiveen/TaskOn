@@ -142,6 +142,7 @@ STATICFILES_DIRS = [
 
 # WhiteNoise для раздачи статических файлов
 if not DEBUG:
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
     STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
