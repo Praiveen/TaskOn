@@ -1,0 +1,349 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskOn - Личные встречи{% endblock %}
+
+{% block links %}
+<link rel="icon" type="img/svg+xml" href="{% static 'img/headIcons/event-1-svgrepo-com.svg' %}">
+<link rel="icon" href="{% static 'img/headIcons/video_card.ico' %}" sizes="any">
+<link rel="icon" type="img/png" href="{% static 'img/headIcons/event-1-svgrepo-com.png' %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboardPage.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/personalMeetings.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body_attributes %}id="PersonalMeetings"{% endblock %}
+
+{% block header %}
+{% include 'header_personal.html' %}
+{% endblock %}
+
+{% block content %}
+<div id="currentUserId" data-user-id="{{ user.userId }}" style="display:none;"></div>
+
+<main class="personal-meetings-container">
+    <div class="personal-meetings-header">
+        <h1>Личные встречи</h1>
+        <div class="actions">
+            <button id="createTemplateBtn" class="btn-primary">
+                <i class="fas fa-plus"></i> Создать шаблон встречи
+            </button>
+        </div>
+    </div>
+
+    <div class="personal-meetings-tabs">
+        <button class="tab-btn active" data-tab="overview">Обзор</button>
+        <button class="tab-btn" data-tab="templates">Мои шаблоны</button>
+        <button class="tab-btn" data-tab="availability">Расписание доступности</button>
+        <button class="tab-btn" data-tab="requests">Запросы на встречи</button>
+        <button class="tab-btn" data-tab="meetings">Мои встречи</button>
+    </div>
+
+    <div class="tab-content">
+        <div id="overview" class="tab-pane active">
+            <div class="overview-container">
+                <div class="overview-stats">
+                    <div class="stat-card">
+                        <i class="fas fa-calendar-check"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="upcomingMeetingsCount">0</span>
+                            <span class="stat-label">Предстоящие встречи</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-paper-plane"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="pendingRequestsCount">0</span>
+                            <span class="stat-label">Ожидающие запросы</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <i class="fas fa-clipboard-list"></i>
+                        <div class="stat-info">
+                            <span class="stat-value" id="templateCount">0</span>
+                            <span class="stat-label">Шаблонов встреч</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="overview-sections">
+                    <div class="section upcoming-meetings">
+                        <div class="section-header">
+                            <h2>Ближайшие встречи</h2>
+                            <a href="#" class="view-all" data-tab="meetings">Посмотреть все</a>
+                        </div>
+                        <div class="upcoming-meetings-list" id="upcomingMeetingsList">
+                            <div class="empty-list">У вас пока нет предстоящих встреч</div>
+                        </div>
+                    </div>
+                    
+                    <div class="section pending-requests">
+                        <div class="section-header">
+                            <h2>Запросы на встречи</h2>
+                            <a href="#" class="view-all" data-tab="requests">Посмотреть все</a>
+                        </div>
+                        <div class="pending-requests-list" id="pendingRequestsList">
+                            <div class="empty-list">У вас нет ожидающих запросов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="templates" class="tab-pane">
+            <div class="templates-container">
+                <div class="templates-header">
+                    <h2>Ваши шаблоны встреч</h2>
+                    <p>Создавайте шаблоны для различных типов встреч</p>
+                </div>
+                
+                <div class="templates-list" id="templatesList">
+                    <div class="empty-list">У вас пока нет шаблонов встреч</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="availability" class="tab-pane">
+            <div class="availability-container">
+                <div class="availability-header">
+                    <h2>Управление расписанием доступности</h2>
+                    <p>Укажите, когда вы готовы проводить встречи</p>
+                </div>
+                
+                <div class="template-selector">
+                    <label for="availabilityTemplate">Выберите шаблон:</label>
+                    <select id="availabilityTemplate">
+                        <option value="">-- Выберите шаблон --</option>
+                    </select>
+                </div>
+                
+                <div class="availability-schedule" id="availabilitySchedule">
+                    <div class="empty-list">Сначала выберите шаблон встречи</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="requests" class="tab-pane">
+            <div class="requests-container">
+                <div class="requests-tabs">
+                    <button class="request-tab-btn active" data-tab="incoming">Входящие запросы</button>
+                    <button class="request-tab-btn" data-tab="outgoing">Исходящие запросы</button>
+                </div>
+                
+                <div class="request-tab-content">
+                    <div id="incoming" class="request-tab-pane active">
+                        <div class="incoming-requests-list" id="incomingRequestsList">
+                            <div class="empty-list">У вас нет входящих запросов</div>
+                        </div>
+                    </div>
+                    
+                    <div id="outgoing" class="request-tab-pane">
+                        <div class="outgoing-requests-list" id="outgoingRequestsList">
+                            <div class="empty-list">У вас нет исходящих запросов</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="meetings" class="tab-pane">
+            <div class="meetings-container">
+                <div class="meetings-tabs">
+                    <button class="meeting-tab-btn active" data-tab="upcoming-meetings">Предстоящие</button>
+                    <button class="meeting-tab-btn" data-tab="past-meetings">Прошедшие</button>
+                </div>
+                
+                <div class="meeting-tab-content">
+                    <div id="upcoming-meetings" class="meeting-tab-pane active">
+                        <div class="upcoming-meetings-list full-list" id="upcomingMeetingsFullList">
+                            <div class="empty-list">У вас нет предстоящих встреч</div>
+                        </div>
+                    </div>
+                    
+                    <div id="past-meetings" class="meeting-tab-pane">
+                        <div class="past-meetings-list" id="pastMeetingsList">
+                            <div class="empty-list">У вас нет прошедших встреч</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<aside class="notifications-panel">
+    <h2>Панель уведомлений</h2>
+    <div id="notifications-container" class="notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-item" data-notification-id="{{ notification.notificationId }}">
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-details">{{ notification.sendDate|date:"d.m.Y H:i" }}</div>
+            <div class="notification-actions">
+                <button class="readNotification" data-notification-id="{{ notification.notificationId }}">Прочитано</button>
+            </div>
+        </div>
+        {% empty %}
+        <p class="notification-not-message">Нет новых уведомлений</p>
+        {% endfor %}
+    </div>
+</aside>
+
+<div id="createTemplateModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Создать шаблон встречи</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="createTemplateForm">
+                <div class="form-group">
+                    <label for="templateTitle">Название встречи</label>
+                    <input type="text" id="templateTitle" name="title" required placeholder="Например: Консультация">
+                </div>
+                <div class="form-group">
+                    <label for="templateDescription">Описание</label>
+                    <textarea id="templateDescription" name="description" rows="4" placeholder="Опишите цель и содержание встречи"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="templateDuration">Длительность (минуты)</label>
+                    <input type="number" id="templateDuration" name="duration" min="15" step="15" value="30" required>
+                </div>
+                <div class="form-group">
+                    <label for="templateLocation">Место встречи</label>
+                    <input type="text" id="templateLocation" name="location" placeholder="Офис, кафе или онлайн-платформа">
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Создать шаблон</button>
+                    <button type="button" class="btn-secondary cancel-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="addAvailabilityModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Добавить слот доступности</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="addAvailabilityForm">
+                <div class="form-group">
+                    <label for="availabilityDay">День недели</label>
+                    <select id="availabilityDay" name="dayOfWeek" required>
+                        <option value="0">Понедельник</option>
+                        <option value="1">Вторник</option>
+                        <option value="2">Среда</option>
+                        <option value="3">Четверг</option>
+                        <option value="4">Пятница</option>
+                        <option value="5">Суббота</option>
+                        <option value="6">Воскресенье</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="availabilityStartTime">Время начала</label>
+                    <input type="time" id="availabilityStartTime" name="startTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="availabilityEndTime">Время окончания</label>
+                    <input type="time" id="availabilityEndTime" name="endTime" required>
+                </div>
+                <input type="hidden" id="templateIdForSlot" name="templateId">
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Добавить</button>
+                    <button type="button" class="btn-secondary cancel-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="chooseTimeModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Выбор времени для встречи</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="meeting-info" id="meetingInfo">
+            </div>
+            <h3>Доступные слоты времени</h3>
+            <div class="time-slots" id="availableTimeSlots">
+                <div class="loading">Загрузка доступных слотов...</div>
+            </div>
+            <div class="form-actions">
+                <button type="button" class="btn-primary" id="confirmTimeBtn" disabled>Подтвердить время</button>
+                <button type="button" class="btn-secondary cancel-btn">Отмена</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="inviteModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Отправить приглашение на встречу</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="inviteForm">
+                <div class="form-group">
+                    <label for="inviteeEmail">Email приглашаемого</label>
+                    <input type="email" id="inviteeEmail" name="inviteeEmail" required placeholder="mail@example.com">
+                </div>
+                <div class="form-group">
+                    <label for="inviteMessage">Персональное сообщение (опционально)</label>
+                    <textarea id="inviteMessage" name="message" rows="4" placeholder="Добавьте персональное сообщение к приглашению"></textarea>
+                </div>
+                <input type="hidden" id="templateIdForInvite" name="templateId">
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Отправить приглашение</button>
+                    <button type="button" class="btn-secondary cancel-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="addNotesModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Добавить заметки к встрече</h2>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <form id="addNotesForm">
+                <div class="form-group">
+                    <label for="meetingNotes">Заметки о встрече</label>
+                    <textarea id="meetingNotes" name="notes" rows="6" placeholder="Введите заметки по итогам встречи" required></textarea>
+                </div>
+                <input type="hidden" id="meetingIdForNotes" name="meetingId">
+                <div class="form-actions">
+                    <button type="submit" class="btn-primary">Сохранить заметки</button>
+                    <button type="button" class="btn-secondary cancel-btn">Отмена</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% comment %}Футер отключен в шаблоне personal_meetings.html{% endcomment %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/headerSlider.js' %}"></script>
+<script src="{% static 'js/personalMeetings.js' %}"></script>
+{% endblock %} 

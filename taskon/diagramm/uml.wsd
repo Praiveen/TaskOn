@@ -1,0 +1,198 @@
+@startuml
+
+' Настройки стиля и layout
+skinparam class {
+    BackgroundColor White
+    ArrowColor #2688d4
+    BorderColor #2688d4
+}
+
+left to right direction
+skinparam linetype ortho
+skinparam nodesep 150
+skinparam ranksep 150
+
+package "Core Entities" {
+    class User {
+        ' Атрибуты
+        -Long userId
+        -String fullName
+        -String firstName
+        -String lastName
+        -String phoneNumber
+        -String email
+        -String password
+        -Date createdAt
+        -Date updatedAt
+        -Department department
+        -SubDepartment subDepartment
+        -Company company
+        -Set<Role> roles
+        -List<Notification> sentNotifications
+        -List<Notification> receivedNotifications
+        -List<Event> participatingEvents
+        
+        ' Методы
+        +findByEmail(String email)
+        +findById(int id)
+        +save(User user)
+        +allUsers()
+        +getUserIdFromSecurity()
+        +signup(RegisterUserDto input)
+        +authenticate(LoginUserDto input)
+        +getAuthorities()
+        +isAccountNonExpired()
+        +isEnabled()
+    }
+
+    class Company {
+        ' Атрибуты
+        -Long companyId
+        -String companyName
+        -String address
+        -List<Notification> notifications
+        -User director
+        -List<Department> departments
+        -List<User> users
+        
+        ' Методы
+        +findAll()
+        +findById(Long id)
+        +save(Company company)
+        +deleteById(Long directorId)
+        +findByDirector(User director)
+    }
+
+    class Role {
+        ' Атрибуты
+        -Long id
+        -String name
+        -String description
+        -static String USER
+        -static String DIRECTOR
+        -static String DEPARTMENT_MANAGER
+        -static String SUBDEPARTMENT_MANAGER
+        -static String EMPLOYEE
+        -static String FULL_ACCESS
+        
+        ' Методы
+        +findAll()
+        +changeUserRole()
+        +addRoleToUser()
+        +removeRoleFromUser()
+        +getUserRoles()
+        +userHasRole()
+    }
+}
+
+package "Department Management" {
+    class Department {
+        ' Атрибуты
+        -Long departmentId
+        -String departmentName
+        -Company company
+        -User manager
+        -List<SubDepartment> subDepartments
+        -List<User> users
+        
+        ' Методы
+        +findAll()
+        +findById(Long id)
+        +save()
+        +deleteById()
+        +isUserDepartmentManager()
+        +findByCompany()
+        +updateDepartment()
+    }
+
+    class SubDepartment {
+        ' Атрибуты
+        -Long subdepartmentId
+        -String subdepartmentName
+        -Department department
+        -User manager
+        -List<User> users
+        
+        ' Методы
+        +findAll()
+        +findById(Long id)
+        +save()
+        +deleteById()
+        +isUserSubDepartmentManager()
+        +findByManager()
+    }
+}
+
+package "Activities" {
+    class Event {
+        ' Атрибуты
+        -Long eventId
+        -String title
+        -String description
+        -LocalDateTime startTime
+        -LocalDateTime endTime
+        -String location
+        -String status
+        -User createdBy
+        -List<User> participants
+        
+        ' Методы
+        +findAll()
+        +findById()
+        +save()
+        +deleteById()
+        +findByParticipant()
+    }
+
+    class Meeting {
+        ' Атрибуты
+        -Long meetingId
+        -String topic
+        -String agenda
+        -LocalDateTime startTime
+        -LocalDateTime endTime
+        -String status
+        -User organizer
+        -List<User> participants
+        
+        ' Методы
+        +findAll()
+        +findById()
+        +save()
+        +deleteById()
+        +findByParticipant()
+    }
+}
+
+package "Communication" {
+    class Notification {
+        ' Атрибуты
+        -Long notificationId
+        -String message
+        -String type
+        -Company company
+        -User sender
+        -User receiver
+        -LocalDateTime sendDate
+        -boolean isCompleted
+        
+        ' Методы
+        +getAllNotifications()
+        +findById()
+        +save()
+        +existsBySenderAndCompanyAndIsCompleted()
+        +findByReceiverAndIsCompleted()
+    }
+}
+
+Company "1" *-- "0..*" Department
+Company "1" *-- "0..*" User
+Department "1" *-- "0..*" SubDepartment
+Department "1" o-- "0..*" User
+SubDepartment "1" o-- "0..*" User
+User "1" -- "0..*" Event
+User "1" -- "0..*" Meeting
+User "1" -- "0..*" Notification
+User "1" -- "0..*" Role
+
+@enduml

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskOn - Профиль{% endblock %}
+
+{% block links %}
+<link rel="icon" type="img/svg+xml" href="{% static 'img/headIcons/event-1-svgrepo-com.svg' %}">
+<link rel="icon" href="{% static 'img/headIcons/video_card.ico' %}" sizes="any">
+<link rel="icon" type="img/png" href="{% static 'img/headIcons/event-1-svgrepo-com.png' %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboardPage.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body_attributes %}id="Topic1"{% endblock %}
+
+{% block header %}
+{% include 'header_dashboard.html' %}
+{% endblock %}
+
+{% block content %}
+<main class="gridsp-1-15 grey-frame mrgn-all03-grey-frame flex-dir-col">
+    <article class="back-link">
+        <a href="{% url 'dashboard' %}">
+            <i class="fas fa-arrow-left"></i>
+            На главную
+        </a>
+    </article>
+    <article class="flex1 profile profile-container">
+        <div class="profile-header">
+            <h1>Личный кабинет</h1>
+            <p>Управление личными данными</p>
+        </div>
+
+        <form id="profileForm" class="profile-form">
+            {% csrf_token %}
+            <div class="field-wrapper">
+                <label for="email">Email</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" disabled>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="firstName">Имя</label>
+                <input type="text" id="firstName" name="firstName" value="{{ user.firstName }}" required>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="lastName">Фамилия</label>
+                <input type="text" id="lastName" name="lastName" value="{{ user.lastName }}" required>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="phone">Телефон</label>
+                <input type="tel" id="phone" name="phone" value="{{ user.phone }}" required>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="company">Компания</label>
+                <input type="text" id="company" name="company" value="{{ user.company.name|default_if_none:'' }}" disabled>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="department">Отдел</label>
+                <input type="text" id="department" name="department" value="{{ user.department.name|default_if_none:'' }}" disabled>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="department">Рабочая группа</label>
+                <input type="text" id="subDepartment" name="subDepartment" value="{{ user.subdepartment.name|default_if_none:'' }}" disabled>
+            </div>
+
+            <div class="field-wrapper">
+                <label for="role">Роль</label>
+                <input type="text" id="role" name="role" value="{{ user.role.name|default_if_none:'' }}" disabled>
+            </div>
+
+            <button type="submit" class="update-btn">Обновить данные</button>
+        </form>
+
+        <div id="statusMessage" class="status-message" style="display: none;"></div>
+    </article>
+</main>
+<aside class="gridsp-16-3 mrgn-lft0-grey-frame grey-frame">
+    <h2>Панель уведомлений</h2>
+    <div id="notifications-container" class="notification-container">
+        {% for notification in notifications %}
+        <div class="notification">
+            <div class="notification-header">
+                <span class="notification-title">{{ notification.title }}</span>
+                <span class="notification-date">{{ notification.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <p class="notification-message">{{ notification.message }}</p>
+        </div>
+        {% empty %}
+        <p>Нет новых уведомлений</p>
+        {% endfor %}
+    </div>
+</aside>
+{% endblock %}
+
+{% block footer %}
+{% comment %}Футер отключен в шаблоне profile.html{% endcomment %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/headerSlider.js' %}"></script>
+<script src="{% static 'js/profileLoader.js' %}"></script>
+<script src="{% static 'js/dashboardOperator.js' %}"></script>
+{% endblock %} 

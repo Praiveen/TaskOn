@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskOn - Вход{% endblock %}
+
+{% block body_attributes %}id="Topic1"{% endblock %}
+
+{% block header %}
+{% include 'header_starter.html' %}
+{% endblock %}
+
+{% block content %}
+<main class="contentMainPage">
+    <article>
+        <section>
+            <div class="modal-container">
+                <div class="modal-block">
+                    <h1>Вход в аккаунт</h1>
+                    
+                    {% if error %}
+                    <div class="alert">
+                        <h1>{{ error }}</h1>
+                    </div>
+                    {% endif %}
+                    
+                    <form id="loginForm" class="modal-form">
+                        {% csrf_token %}
+                        
+                        <div class="alert" id="errorAlert"></div>
+                        <div class="success" id="successAlert" style="display: none;"></div>
+                        
+                        <input id="email" name="email" type="email" placeholder="Введите почту" required />
+                        <input id="password" name="password" type="password" placeholder="Введите пароль" required>
+                        
+                        <button id="enterButton" type="submit" class="auth-button">Войти</button>
+                    </form>
+                    
+                    <div class="modalFormSpecial">
+                        <p>Нет аккаунта?</p>
+                        <a href="{% url 'register' %}"><button class="auth-button" type="button">Зарегистрироваться</button></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </article>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/login.js' %}"></script>
+{% endblock %} 

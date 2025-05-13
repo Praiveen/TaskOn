@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskOn - Главная{% endblock %}
+
+{% block body_attributes %}id="Topic1"{% endblock %}
+
+{% block header %}
+{% include 'header_starter.html' %}
+{% endblock %}
+
+{% block content %}
+<main class="contentMainPage">
+    <article>
+        <section>
+            <h1>Управляйте персональными и корпоративными встречами и событиями</h1>
+            <div class="image-gallery">
+                <div class="gallery-item">
+                    <img src="{% static 'img/starterpage/calendar.png' %}" alt="Календарь событий">
+                    <h3>Умный календарь</h3>
+                    <p>Планируйте корпоративные и личные встречи с удобным интерактивным календарем</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="{% static 'img/starterpage/copeWork.png' %}" alt="Командная работа">
+                    <h3>Личный менеджер</h3>
+                    <p>Сосредоточьтесь на важных задачах и делегируйте остальные</p>
+                </div>
+                <div class="gallery-item">
+                    <img src="{% static 'img/starterpage/notif.png' %}" alt="Уведомления">
+                    <h3>Командная работа</h3>
+                    <p>Организуйте взаимодействие между отделами, подразделениями и отдельными сотрудниками</p>
+                </div>
+            </div>
+            <div class="description">
+                <div class="description-block">
+                    <h2>Оптимизируйте рабочие процессы</h2>
+                    <p>TaskOn - это современная платформа для управления событиями и личными встречами, которая помогает организациям эффективно планировать и координировать коммуникацию любого масштаба.</p>
+                </div>
+                <div class="description-block">
+                    <h2>Личные и корпоративные встречи</h2>
+                    <p>Создавайте личные встречи с коллегами, бронируйте переговорные комнаты и организуйте корпоративные мероприятия с удобной системой приглашений и уведомлений.</p>
+                </div>
+                <div class="description-block">
+                    <h2>Эффективное взаимодействие</h2>
+                    <p>Организуйте работу команды на новом уровне: управляйте структурой компании, координируйте взаимодействие между сотрудниками и отслеживайте статусы всех мероприятий в реальном времени.</p>
+                </div>
+            </div>
+        </section>
+    </article>
+</main>
+{% endblock %}
+
+{% block footer %}
+{% include 'footer.html' %}
+{% endblock %} 

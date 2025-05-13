@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskOn - Регистрация{% endblock %}
+
+{% block body_attributes %}id="Topic1"{% endblock %}
+
+{% block header %}
+{% include 'header_starter.html' %}
+{% endblock %}
+
+{% block content %}
+<main class="contentMainPage">
+    <article>
+        <section>
+            <div class="modal-container">
+                <div class="modal-block">
+                    <h1>Регистрация</h1>
+                    
+                    {% if error %}
+                    <div class="alert">
+                        <h1>{{ error }}</h1>
+                    </div>
+                    {% endif %}
+                    
+                    <form id="registerForm" class="modal-form">
+                        {% csrf_token %}
+                        
+                        <div class="alert" id="errorAlert"></div>
+                        <div class="success" id="successAlert" style="display: none;"></div>
+                        
+                        <input type="email" id="email" name="email" required placeholder="Введите почту" />
+                        <input type="text" id="firstName" name="firstName" required placeholder="Введите Имя" />
+                        <input type="text" id="lastName" name="lastName" required placeholder="Введите Фамилию" />
+                        <input type="text" id="fullName" name="fullName" required placeholder="Введите ФИО полностью" />
+                        
+                        <small class="password-hint">Пароль должен содержать минимум 5 символов</small>
+                        <input type="password" id="password" name="password" required placeholder="Введите пароль">
+                        <input type="password" id="passwordConfirm" name="passwordConfirm" placeholder="Подтвердите пароль" required>
+                        
+                        <button id="regButton" type="submit" class="auth-button">Зарегистрироваться</button>
+                    </form>
+                    
+                    <div class="modalFormSpecial">
+                        <p>Уже есть аккаунт?</p>
+                        <a href="{% url 'login' %}"><button class="auth-button" type="button">Войти</button></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </article>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/registration.js' %}"></script>
+{% endblock %} 

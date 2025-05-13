@@ -1,0 +1,20 @@
+{% load static %}
+<header class="gridsp-1-18">
+    <nav>
+        <div class="nav">
+            <div class="nav-menu">
+                <div class="dropdown">
+                    <button class="dropbtn">
+                        <p>{{ user.firstName }} {{ user.lastName }}</p>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="dropdown-content">
+                        <a href="{% url 'profile' %}">Личный кабинет</a>
+                        <a href="{% url 'personal_meetings' %}">Личный раздел</a>
+                        <a href="{% url 'auth_logout' %}">Выйти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+</header> 

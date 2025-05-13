@@ -1,0 +1,472 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskOn - Панель управления{% endblock %}
+
+{% block links %}
+<link rel="icon" type="img/svg+xml" href="{% static 'img/headIcons/event-1-svgrepo-com.svg' %}">
+<link rel="icon" type="img/png" href="{% static 'img/headIcons/event-1-svgrepo-com.png' %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboardPage.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body_attributes %}id="Topic1"{% endblock %}
+
+{% block header %}
+{% include 'header_dashboard.html' %}
+{% endblock %}
+
+{% block content %}
+<form id="csrf-form" style="display: none;">
+    {% csrf_token %}
+</form>
+<aside class="gridsp-1-2 mrgn-rgt0-grey-frame grey-frame">
+    <div class="slider-tabs">
+        <button class="tab" data-target="section1">Календарь</button>
+        <button class="tab" data-target="section2">События</button>
+        <button class="tab" data-target="section3">Встречи</button>
+        {% if 'DIRECTOR' in user_roles or 'DEPARTMENT_MANAGER' in user_roles or 'SUBDEPARTMENT_MANAGER' in user_roles %}
+        <button class="tab" data-target="section4">Создание событий и встреч</button>
+        <button class="tab" data-target="section5">Управление структурой</button>
+        {% endif %}
+    </div>
+</aside>
+<main class="flex1 gridsp-3-13">
+    <article class="slider-content flex1">
+        <section class="content flex1 grey-frame" id="section1">
+            <div id="calendar">
+                <div class="header">
+                  <button id="prev">←</button>
+                  <h1 id="month-year"></h1>
+                  <button id="next">→</button>
+                </div>
+                <div class="weekdays">
+                  <div>Понедельник</div>
+                  <div>Вторник</div>
+                  <div>Среда</div>
+                  <div>Четверг</div>
+                  <div>Пятница</div>
+                  <div>Суббота</div>
+                  <div>Воскресенье</div>
+                </div>
+                <div id="days" class="days"></div>
+              </div>
+        </section>
+        <section class="content grey-frame" id="section2">
+            <h2>Текущие события</h2>
+            <div class="current-events">
+                {% for event in current_events %}
+                <div class="event-card" data-event-id="{{ event.eventId }}">
+                    <div class="event-header">
+                        <h3>{{ event.title }}</h3>
+                        <span class="event-date">{{ event.startTime|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <p class="event-description">{{ event.description }}</p>
+                    <div class="event-details">
+                        <span class="event-location"><i class="fas fa-map-marker-alt"></i> {{ event.location }}</span>
+                        <span class="event-status">Статус: {{ event.get_status_display }}</span>
+                    </div>
+                    <div class="event-actions">
+                        {% if event.can_edit %}
+                        <button class="btn-complete-event" data-event-id="{{ event.eventId }}">Завершить</button>
+                        <button class="btn-delete-event" data-event-id="{{ event.eventId }}">Удалить</button>
+                        {% endif %}
+                    </div>
+                </div>
+                {% empty %}
+                <p>Нет активных событий</p>
+                {% endfor %}
+            </div>
+            <h2>Прошедшие события</h2>  
+            <div class="past-events">
+                {% for event in past_events %}
+                <div class="event-card completed" data-event-id="{{ event.eventId }}">
+                    <div class="event-header">
+                        <h3>{{ event.title }}</h3>
+                        <span class="event-date">{{ event.startTime|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <p class="event-description">{{ event.description }}</p>
+                    <div class="event-details">
+                        <span class="event-location"><i class="fas fa-map-marker-alt"></i> {{ event.location }}</span>
+                        <span class="event-status">Статус: {{ event.get_status_display }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <p>Нет прошедших событий</p>
+                {% endfor %}
+            </div>
+        </section>
+        <section class="content grey-frame" id="section3">
+            <h2>Текущие встречи</h2>
+            <div class="current-meetings">
+            </div>
+            <h2>Прошедшие встречи</h2>  
+            <div class="past-meetings">
+            </div>
+        </section>
+        
+        {% if 'DIRECTOR' in user_roles or 'DEPARTMENT_MANAGER' in user_roles or 'SUBDEPARTMENT_MANAGER' in user_roles %}
+        <section class="content grey-frame" id="section4">
+            <div class="event-creation-container">
+                <div class="section-header">
+                    <h2>Создание встреч и событий</h2>
+                    <p class="section-description">Создавайте встречи и события для сотрудников</p>
+                </div>
+                <div class="forms-container">
+                    <div class="create-meeting-block">
+                        <h3>Создание встречи</h3>
+                        <form id="createMeetingForm" class="meeting-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="meetingTopic">Тема встречи:</label>
+                                <input type="text" id="meetingTopic" name="meetingTopic" required class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="meetingAgenda">Повестка дня:</label>
+                                <textarea id="meetingAgenda" name="meetingAgenda" class="form-input"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="meetingStartTime">Начало:</label>
+                                    <input type="datetime-local" id="meetingStartTime" name="meetingStartTime" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="meetingEndTime">Окончание:</label>
+                                    <input type="datetime-local" id="meetingEndTime" name="meetingEndTime" required class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="meetingLocation">Место проведения:</label>
+                                <input type="text" id="meetingLocation" name="meetingLocation" required class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label>Получатели:</label>
+                                <button type="button" class="btn-select-recipients" data-form-type="meeting">
+                                    <i class="fas fa-users"></i> Выбрать получателей
+                                </button>
+                                <div class="selected-recipients-container">
+                                    <!-- Здесь будут отображаться выбранные получатели -->
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-plus"></i> Создать встречу
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="create-event-block">
+                        <h3>Создание события</h3>
+                        <form id="createEventForm" class="event-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="eventTitle">Название события:</label>
+                                <input type="text" id="eventTitle" name="eventTitle" required class="form-input">
+                            </div>
+                            <div class="form-group">
+                                <label for="eventDescription">Описание события:</label>
+                                <textarea id="eventDescription" name="eventDescription" class="form-input"></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="eventStartTime">Начало:</label>
+                                    <input type="datetime-local" id="eventStartTime" name="eventStartTime" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="eventEndTime">Окончание:</label>
+                                    <input type="datetime-local" id="eventEndTime" name="eventEndTime" required class="form-input">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Получатели:</label>
+                                <button type="button" class="btn-select-recipients" data-form-type="event">
+                                    <i class="fas fa-users"></i> Выбрать получателей
+                                </button>
+                                <div class="selected-recipients-container">
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-plus"></i> Создать событие
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section class="content grey-frame" id="section5">
+            <div class="department-management">
+                <div class="section-header">
+                    <h2>Управление структурой компании</h2>
+                    <p class="section-description">Создавайте отделы и назначайте руководителей</p>
+                </div>
+        
+                <div class="management-container">
+                    {% if 'DIRECTOR' in user_roles %}
+                    <div class="create-department-block">
+                        <h3>Создание нового отдела</h3>
+                        <form id="createDepartmentForm" class="department-form">
+                            {% csrf_token %}
+                            <div class="form-group">
+                                <label for="departmentName">Название отдела:</label>
+                                <input type="text" id="departmentName" name="departmentName" placeholder="Введите название отдела" required class="form-input">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="departmentHead">Руководитель отдела:</label>
+                                <select id="departmentHead" name="departmentHead" required class="form-select">
+                                    <option value="">Выберите руководителя</option>
+                                    {% for user in company_users %}
+                                    <option value="{{ user.userId }}">{{ user.fullName }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                
+                            <div class="form-actions">
+                                <button type="submit" class="btn-primary">
+                                    <i class="fas fa-plus"></i> Создать отдел
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+        
+                    <div class="departments-list-block overflow-auto">
+                        <div class="block-header">
+                            <h3>Существующие отделы</h3>
+                            <p class="block-description">Список всех отделов компании и их руководителей</p>
+                        </div>
+                        <div class="departments-container">
+                            {% for department in departments %}
+                            <div class="department-item" data-department-id="{{ department.departmentId }}">
+                                <div class="department-info">
+                                    <h4>{{ department.name }}</h4>
+                                    <p>Руководитель: {{ department.manager.fullName }}</p>
+                                </div>
+                                <div class="department-actions">
+                                    <button class="btn-edit-department" data-department-id="{{ department.departmentId }}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn-view-subdepartments" data-department-id="{{ department.departmentId }}">
+                                        <i class="fas fa-sitemap"></i> Рабочие группы
+                                    </button>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p>Нет созданных отделов</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if 'DIRECTOR' in user_roles or 'DEPARTMENT_MANAGER' in user_roles %}
+                    <div class="create-subdepartment-block" style="display: none;">
+                        <div class="form-container">
+                            <h3>Создание рабочей группы</h3>
+                            <form id="createSubDepartmentForm" class="department-form">
+                                {% csrf_token %}
+                                <div class="form-group">
+                                    <label for="subdepartmentName">Название рабочей группы:</label>
+                                    <input type="text" id="subdepartmentName" name="subdepartmentName" 
+                                           placeholder="Введите название рабочей группы" required class="form-input">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="subDepartmentHead">Руководитель рабочей группы:</label>
+                                    <select id="subDepartmentHead" name="subDepartmentHead" required class="form-select">
+                                        <option value="">Выберите руководителя</option>
+                                        {% for user in department_users %}
+                                        <option value="{{ user.userId }}">{{ user.fullName }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                    
+                                <div class="form-actions">
+                                    <button type="submit" class="btn-primary">
+                                        <i class="fas fa-plus"></i> Создать рабочую группу
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                    
+                    <div class="subdepartments-list-block overflow-auto" style="display: none;">
+                        <div class="block-header">
+                            <h3>Рабочие группы</h3>
+                            <p class="block-description">Список всех рабочих групп и их руководителей</p>
+                        </div>
+                        <div class="subdepartments-container">
+                        </div>
+                    </div>
+
+                    <div class="department-employees-block" style="display: none;">
+                        <div class="block-header">
+                            <h3>Управление сотрудниками отдела</h3>
+                            <p class="block-description">Назначайте и перемещайте сотрудников между отделами</p>
+                        </div>
+                        
+                        <div class="employees-management">
+                            <div class="employees-header">
+                                <div class="employees-title">Сотрудники отдела</div>
+                                <button class="btn-primary add-employees" id="addDepartmentEmployees">
+                                    <i class="fas fa-user-plus"></i> Добавить сотрудников
+                                </button>
+                            </div>
+                            
+                            <div class="employee-drag-area overflow-auto" id="departmentEmployeesList">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    {% if 'DIRECTOR' in user_roles or 'DEPARTMENT_MANAGER' in user_roles or 'SUBDEPARTMENT_MANAGER' in user_roles %}
+                    <div class="subdepartment-employees-block" style="display: none;">
+                        <div class="block-header">
+                            <h3>Управление сотрудниками рабочей группы</h3>
+                            <p class="block-description">Управляйте составом рабочей группы</p>
+                        </div>
+                        
+                        <div class="employees-management">
+                            <div class="employees-header">
+                                <div class="employees-title">Сотрудники рабочей группы</div>
+                                <button class="btn-primary add-employees" id="addSubdepartmentEmployees">
+                                    <i class="fas fa-user-plus"></i> Добавить сотрудников
+                                </button>
+                            </div>
+                            
+                            <div class="employee-drag-area overflow-auto" id="subdepartmentEmployeesList">
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+        {% endif %}
+    </article>
+</main>
+<aside class="gridsp-16-3 mrgn-lft0-grey-frame grey-frame">
+    <h2>Панель уведомлений</h2>
+    <div id="notifications-container" class="notifications-list">
+        {% for notification in notifications %}
+        <div class="notification-item" data-notification-id="{{ notification.notificationId }}">
+            <div class="notification-message">{{ notification.message }}</div>
+            <div class="notification-details">{{ notification.sendDate|date:"d.m.Y H:i" }}</div>
+            <div class="notification-actions">
+                <button class="readNotification" data-notification-id="{{ notification.notificationId }}">Прочитано</button>
+            </div>
+        </div>
+        {% empty %}
+        <p class="notification-not-message">Нет новых уведомлений</p>
+        {% endfor %}
+    </div>
+</aside>
+
+<div id="recipientsModal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Выбор получателей</h3>
+            <span class="close">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="search-container">
+                <input type="text" id="recipientSearch" placeholder="Поиск получателей...">
+            </div>
+            <div class="recipients-list">
+                <!-- Здесь будут отображаться получатели -->
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="closeRecipientsModal">Закрыть</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalWindow" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title"></h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+        </div>
+    </div>
+</div>
+
+<div id="employeesModal" class="modal employees-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 class="modal-title">Добавление сотрудников</h3>
+            <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="text" class="employee-search" placeholder="Поиск сотрудников...">
+            <div class="employees-list">
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{% comment %}Футер отключен в шаблоне dashboard.html{% endcomment %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.userRoles = {{ user_roles|safe }};
+</script>
+<script src="{% static 'js/headerSlider.js' %}"></script>
+<script src="{% static 'js/dashboardOperator.js' %}"></script>
+<script src="{% static 'js/calendar.js' %}"></script>
+<script src="{% static 'js/eventManager.js' %}"></script>
+<script src="{% static 'js/currentUserEvents.js' %}"></script>
+<script src="{% static 'js/currentUserMeetings.js' %}"></script>
+<script src="{% static 'js/notifications.js' %}"></script>
+<script type="module" src="{% static 'js/searchInSelection.js' %}"></script>
+<script type="module" src="{% static 'js/employeeManager.js' %}"></script>
+<script type="module">
+    import EmployeeManager from '{% static "js/employeeManager.js" %}';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.userRoles) {
+            const employeeManager = new EmployeeManager();
+            window.employeeManager = employeeManager;
+        }
+    });
+</script>
+<script type="module">
+    import { SubDepartmentManager } from '{% static "js/subDepartmentManager.js" %}';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.userRoles && (window.userRoles.includes('DIRECTOR') || 
+                                window.userRoles.includes('DEPARTMENT_MANAGER') || 
+                                window.userRoles.includes('SUBDEPARTMENT_MANAGER'))) {
+            const subDepartmentManager = new SubDepartmentManager();
+            window.subDepartmentManager = subDepartmentManager;
+        }
+    });
+</script>
+<script type="module" src="{% static 'js/departmentManager.js' %}"></script>
+<script type="module">
+    import DepartmentManager from '{% static "js/departmentManager.js" %}';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.userRoles && (window.userRoles.includes('DIRECTOR') || window.userRoles.includes('DEPARTMENT_MANAGER'))) {
+            const departmentManager = new DepartmentManager();
+            window.departmentManager = departmentManager;
+        }
+    });
+</script>
+{% endblock %} 

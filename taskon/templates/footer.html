@@ -1,0 +1,35 @@
+{% load static %}
+<footer>
+    <div class="grid-foot" id="Topic2">
+        <div class="block-foot">
+            <h1>О продукте</h1>
+            <p>TaskOn - ваш надежный помощник в организации как корпоративных, так и личных событий. Мы создали эту платформу для упрощения планирования и координации мероприятий. Наш сервис помогает эффективно управлять встречами, событиями и уведомлениями, обеспечивая слаженную работу всех подразделений.</p>
+        </div>
+        <div class="block-foot">
+            <div class="other-pages">
+                <h1>Страницы</h1>
+                <ul>
+                    <li><a href="{% url 'index' %}">Главная</a></li>
+                    <li><a href="{% url 'login' %}">Войти</a></li>
+                    <li><a href="{% url 'auth_signup' %}">Зарегистрироваться</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="block-foot">
+            <div class="other-pages">
+                <h1>Контакты</h1>
+                <div class="inline-tel">
+                    <img src="{% static 'img/footerIcons/phone-svgrepo-com.svg' %}" alt="Телефон">
+                    <a href="tel:+79998887766">+7(999)888-77-66</a>
+                </div>
+                <div class="inline-tel">
+                    <img src="{% static 'img/footerIcons/location-pin-alt-svgrepo-com.svg' %}" alt="Адрес">
+                    <a href="#">Вернадка 78</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="copyright">
+        <p>© TaskOn, Карагачев Иван ИКБО-36-22, Все права защищены 2025</p>
+    </div>
+</footer> 

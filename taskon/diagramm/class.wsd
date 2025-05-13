@@ -1,0 +1,179 @@
+@startuml
+' Вертикальная ориентация (по умолчанию top to bottom)
+' Можно явно указать:
+left to right direction
+skinparam linetype ortho
+
+skinparam class {
+    BackgroundColor White
+    ArrowColor #2688d4
+    BorderColor #2688d4
+}
+
+package "Core Entities" {
+    class User {
+        -Long userId
+        -String fullName
+        -String firstName
+        -String lastName
+        -String phoneNumber
+        -String email
+        -String password
+        -Date createdAt
+        -Date updatedAt
+        -Department department
+        -SubDepartment subDepartment
+        -Company company
+        -Set<Role> roles
+        -Set<CompanyRole> companyRoles
+        -List<Notification> sentNotifications
+        -List<Notification> receivedNotifications
+        -List<Event> createdEvents
+        -List<Event> participatingEvents
+        -List<Meeting> organizedMeetings
+        -List<Meeting> meetings
+        -List<MeetingTemplate> meetingTemplates
+        -List<PersonalMeetingRequest> sentMeetingRequests
+        -List<PersonalMeetingRequest> receivedMeetingRequests
+    }
+
+    class Company {
+        -Long companyId
+        -String companyName
+        -String address
+        -User director
+        -List<Department> departments
+        -List<User> users
+        -List<CompanyRole> companyRoles
+        -List<Notification> notifications
+    }
+
+    class CompanyRole {
+        -Long roleId
+        -String roleName
+        -String description
+        -Company company
+        -Set<User> users
+    }
+}
+
+package "Department Management" {
+    class Department {
+        -Long departmentId
+        -String departmentName
+        -Company company
+        -User manager
+        -List<SubDepartment> subDepartments
+        -List<User> users
+    }
+
+    class SubDepartment {
+        -Long subdepartmentId
+        -String subdepartmentName
+        -Department department
+        -User manager
+        -List<User> users
+    }
+}
+
+package "Activities" {
+    class Event {
+        -Long eventId
+        -String title
+        -String description
+        -LocalDateTime startTime
+        -LocalDateTime endTime
+        -String location
+        -String status
+        -User createdBy
+        -List<User> participants
+    }
+
+    class Meeting {
+        -Long meetingId
+        -String topic
+        -String agenda
+        -LocalDateTime startTime
+        -LocalDateTime endTime
+        -String status
+        -String location
+        -User organizer
+        -List<User> participants
+    }
+
+    class MeetingTemplate {
+        -Long templateId
+        -User owner
+        -String title
+        -String description
+        -Integer duration
+        -String location
+        -Boolean isActive
+        -Date createdAt
+        -List<AvailabilitySchedule> availabilitySchedules
+        -List<PersonalMeetingRequest> meetingRequests
+    }
+
+    class AvailabilitySchedule {
+        -Long scheduleId
+        -MeetingTemplate template
+        -Integer dayOfWeek
+        -Time startTime
+        -Time endTime
+    }
+
+    class PersonalMeetingRequest {
+        -Long requestId
+        -MeetingTemplate template
+        -User organizer
+        -User invitee
+        -String message
+        -String status
+        -Date createdAt
+        -Date expiryDate
+        -PersonalMeeting personalMeeting
+    }
+
+    class PersonalMeeting {
+        -Long meetingId
+        -PersonalMeetingRequest request
+        -Date startTime
+        -Date endTime
+        -String notes
+        -String status
+    }
+}
+
+package "Communication" {
+    class Notification {
+        -Long notificationId
+        -String title
+        -String message
+        -String type
+        -Company company
+        -User sender
+        -User receiver
+        -LocalDateTime sendDate
+        -Boolean isCompleted
+    }
+}
+
+' --- Связи между классами ---
+Company "1" *-- "0..*" Department
+Company "1" *-- "0..*" User
+Company "1" *-- "0..*" CompanyRole
+Company "1" *-- "0..*" Notification
+Department "1" *-- "0..*" SubDepartment
+Department "1" o-- "0..*" User
+SubDepartment "1" o-- "0..*" User
+User "*" -- "*" CompanyRole
+User "1" -- "0..*" Event
+User "1" -- "0..*" Meeting
+User "1" -- "0..*" Notification
+User "1" -- "0..*" MeetingTemplate
+User "1" -- "0..*" PersonalMeetingRequest
+MeetingTemplate "1" -- "0..*" AvailabilitySchedule
+MeetingTemplate "1" -- "0..*" PersonalMeetingRequest
+PersonalMeetingRequest "1" -- "0..1" PersonalMeeting
+
+@enduml

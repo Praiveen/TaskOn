@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}TaskON - Организации{% endblock %}
+
+{% block links %}
+<link rel="icon" type="img/svg+xml" href="{% static 'img/headIcons/event-1-svgrepo-com.svg' %}">
+<link rel="icon" href="{% static 'img/headIcons/video_card.ico' %}" sizes="any">
+<link rel="icon" type="img/png" href="{% static 'img/headIcons/event-1-svgrepo-com.png' %}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+<link rel="stylesheet" type="text/css" href="{% static 'css/dashboardPage.css' %}">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css">
+
+<link href="https://fonts.googleapis.com/css2?family=Alegreya+SC&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans:wght@700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=PT+Sans+Caption&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block body_attributes %}id="Topic1"{% endblock %}
+
+{% block header %}
+{% include 'header_dashboard.html' %}
+{% endblock %}
+
+{% block content %}
+<main class="gridsp-1-15 grey-frame mrgn-all03-grey-frame">
+    <article class="flex1 flex-main">
+        <div class="back-link-container">
+            <a href="{% url 'dashboard_starter' %}" class="back-link">
+                <i class="fas fa-arrow-left"></i>
+                Назад
+            </a>
+        </div>
+        
+        <div>
+            <h2 class="flex-main-h2">Корпоративный раздел</h2>
+        </div>
+        
+        <div class="container">
+            <div class="box">
+                <h3>Присоединиться к компании</h3>
+                <p>Выберите компанию, к которой хотите присоединиться</p>
+                <select id="companySelect">
+                    <option value="" disabled selected>Выберите компанию</option>
+                    {% for company in companies %}
+                    <option value="{{ company.companyId }}">{{ company.companyName }}</option>
+                    {% endfor %}
+                </select>
+                <button id="sendRequestBtn" onclick="sendRequest()">Отправить заявку</button>
+            </div>
+            
+            <div class="box">
+                <h3>Создать новую компанию</h3>
+                <form id="createCompanyForm" method="post">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="companyName">Название компании:</label>
+                        <input type="text" id="companyName" name="companyName" required placeholder="Введите название компании" />
+                    </div>
+                    <div class="form-group">
+                        <label for="address">Адрес:</label>
+                        <input type="text" id="address" name="address" required placeholder="Введите адрес компании" />
+                    </div>
+                    <button type="submit">Создать компанию</button>
+                </form>
+            </div>
+        </div>
+    </article>
+</main>
+
+<aside class="gridsp-16-3 mrgn-lft0-grey-frame grey-frame">
+    <h2>Панель уведомлений</h2>
+    <div id="notifications-container" class="notification-container">
+        {% for notification in notifications %}
+        <div class="notification">
+            <div class="notification-header">
+                <span class="notification-title">{{ notification.title }}</span>
+                <span class="notification-date">{{ notification.created_at|date:"d.m.Y H:i" }}</span>
+            </div>
+            <p class="notification-message">{{ notification.message }}</p>
+        </div>
+        {% empty %}
+        <p>Нет новых уведомлений</p>
+        {% endfor %}
+    </div>
+</aside>
+{% endblock %}
+
+{% block footer %}
+{% comment %}Футер отключен в шаблоне create_company.html{% endcomment %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'js/companyCreating.js' %}"></script>
+<script src="{% static 'js/companySelector.js' %}"></script>
+<script src="{% static 'js/dashboardOperator.js' %}"></script>
+{% endblock %} 

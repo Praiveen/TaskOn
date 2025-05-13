@@ -1,0 +1,34 @@
+{% load static %}
+<header>
+    <nav>
+        <div class="nav">
+            <div class="nav-tel">
+                <a href="{% url 'index' %}" class="logo-link">TaskOn</a>
+            </div>
+            <input id="menu-toggle" type="checkbox" />
+            <label class='menu-button-container' for="menu-toggle">
+                <div class="all-menu-button">
+                    <div class='menu-button'></div>
+                </div>
+            </label>
+            <div class="nav-menu">
+                <a href="{% url 'login' %}">Войти</a>
+                <a href="{% url 'register' %}">Зарегистрироваться</a>
+            </div>
+        </div>
+    </nav>
+</header>
+
+<style>
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+    font-weight: bold;
+    font-size: 1.5em;
+    transition: color 0.3s ease;
+}
+
+.logo-link:hover {
+    color: #007bff;
+}
+</style> 
